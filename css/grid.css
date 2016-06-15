@@ -1,7 +1,8 @@
 /*
   Variable Grid System.
   Learn more ~ http://www.spry-soft.com/grids/
-  Based on 960 Grid System - http://960.gs/g
+  Based on 960 Grid System - http://960.gs/
+
   Licensed under GPL and MIT.
 */
 
@@ -13,11 +14,16 @@
   Note: IE6 works fine without this fix.
 */
 
+body {
+  min-width: 1200px;
+}
+
 /* Containers
 ----------------------------------------------------------------------------------------------------*/
 .container_12 {
-  margin:0 auto;
-  width:80%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1200px;
 }
 
 /* Grid >> Global
@@ -93,12 +99,11 @@
 }
 
 .container_12 .grid_5 {
-  width:40%;
-  float:none;
+  width:470px;
 }
 
 .container_12 .grid_6 {
-  padding-left:0 !important;
+  width:570px;
 }
 
 .container_12 .grid_7 {
@@ -122,7 +127,7 @@
 }
 
 .container_12 .grid_12 {
-  width:30%;
+  width:1170px;
 }
 
 
@@ -133,7 +138,7 @@
 
 
 .container_12 .prefix_1 {
-  padding-left:8%;
+  padding-left:100px;
 }
 
 .container_12 .prefix_2 {

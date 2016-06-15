@@ -1,35 +1,35 @@
 //TMForm 1.0.1
 $(window).load(function(){
 	$('#contact-form').TMForm({
-		recaptchaPublicKey:'6LeZwukSAAAAAG8HbIAE0XeNvCon_cXThgu9afkj'		
+		recaptchaPublicKey:'6LeZwukSAAAAAG8HbIAE0XeNvCon_cXThgu9afkj'
 	})
 })
 
 ;(function($){
 	$.fn.TMForm=function(opt){
 		return this.each(TMForm)
-		
+
 		function TMForm(){
 			var form=$(this)
-			opt=$.extend({	
+			opt=$.extend({
 					okClass:'ok'
 					,emptyClass:'empty'
 					,invalidClass:'invalid'
 					,successClass:'success'
-					,responseErrorClass:'response-error'	
+					,responseErrorClass:'response-error'
 					,responseMessageClass:'response-message'
 					,processingClass:'processing'
 					,onceVerifiedClass:'once-verified'
-					,mailHandlerURL:'mail/MailHandler.php'					
+					,mailHandlerURL:'mail/MailHandler.php'
 					,successShowDelay:'4000'
 					,stripHTML:true
 					,recaptchaPublicKey:''
 					,capchaTheme:'clean'
 				},opt)
-				
+
 			init()
-			
-			function init(){				
+
+			function init(){
 				form
 					.on('submit',formSubmit)
 					.on('reset',formReset)
@@ -57,14 +57,14 @@ $(window).load(function(){
 						if(e.keyCode===13&&e.ctrlKey)
 							$(this).parents('label').next('label').find('input,textarea').focus()
 					})
-					.on('change','input[type="file"]',function(){						
+					.on('change','input[type="file"]',function(){
 						$(this).parents('label').next('label').find('input,textarea').focus()
-					})					
+					})
 					.attr({
 						method:'POST'
 						,action:opt.mailHandlerURL
 					})
-				
+
 				if($('[data-constraints]',form).length!==0)
 					$('[data-constraints]',form)
 						.regula('bind')
@@ -72,18 +72,18 @@ $(window).load(function(){
 							fieldDesolation($(this))
 						})
 						.on('validate.form',fieldValidate)
-					
-				
+
+
 				$('[placeholder]',form).TMPlaceholder()
-				
+
 				$('[data-type=submit]',form)
-					.click(function(){						
+					.click(function(){
 						form.trigger('submit')
 						return false
 					})
-					
+
 				$('[data-type=reset]',form)
-					.click(function(){						
+					.click(function(){
 						form.trigger('reset')
 						return false
 					})
@@ -95,46 +95,46 @@ $(window).load(function(){
 					showRecaptcha()
 
 			}
-			
+
 			function fieldValidate(el){
 				var el=$(this)
 					,result=el.regula('validate')
 					,isEmpty=false
 					,isInvalid=false
 					,isRequired=!!~el.data('constraints').indexOf('@Required')
-				
+
 				$.each(result,function(){
 					if(this.constraintName==='Required')
 						isEmpty=true
 					else
 						isInvalid=true
 				})
-				
+
 				if(!el.hasClass(opt.onceVerifiedClass)&&!isEmpty)
 					el.addClass(opt.onceVerifiedClass)
-					
+
 				if(isEmpty)
 					el.parents('label').addClass(opt.emptyClass)
-								
+
 				if(isInvalid&&!isEmpty&&isRequired)
 					el.parents('label')
 						.removeClass(opt.emptyClass)
 						.removeClass(opt.okClass)
 						.addClass(opt.invalidClass)
-						
+
 				if(isInvalid&&!isRequired&&el.val())
 					el.parents('label')
 						.removeClass(opt.emptyClass)
 						.removeClass(opt.okClass)
 						.addClass(opt.invalidClass)
-					
+
 				if(!result.length)
 					el.parents('label')
 						.removeClass(opt.invalidClass)
 						.removeClass(opt.emptyClass)
 						.addClass(opt.okClass)
 			}
-			
+
 			function fieldDesolation(el){
 				el
 					.removeClass(opt.onceVerifiedClass)
@@ -143,11 +143,11 @@ $(window).load(function(){
 						.removeClass(opt.emptyClass)
 						.removeClass(opt.okClass)
 			}
-			
+
 			function getValue(el){
 				return el.val()||false
 			}
-			
+
 			function formSubmit(){
 				var $this=$(this)
 					,modal=$('.'+opt.responseMessageClass)
@@ -156,19 +156,19 @@ $(window).load(function(){
 				modal.on('hidden.bs.modal',function(){
 					if(responseMessage!=='success')
 						$('#recaptcha_reload',form).click()
-						,$('#recaptcha_response_field',form).focus()						
+						,$('#recaptcha_response_field',form).focus()
 				})
 
 				$('[data-constraints]',form).trigger('validate.form')
 
 				if($('#recaptcha_response_field',form).val()==='')
 					$('label.recaptcha',form).addClass(opt.emptyClass)
-				
+
 				if(!$('label.'+opt.invalidClass+',label.'+opt.emptyClass,form).length&&!form.hasClass(opt.processingClass)){
 					form.addClass(opt.processingClass)
 					$this.ajaxSubmit(function(e,d,a,c){
 						responseMessage=e
-						if(e=='success'){							
+						if(e=='success'){
 							form
 								.removeClass(opt.processingClass)
 								.addClass(opt.successClass)
@@ -181,7 +181,7 @@ $(window).load(function(){
 								.removeClass(opt.successClass)
 								.trigger('reset')
 							},opt.successShowDelay)
-						}else{							
+						}else{
 							modal.find('.modal-title').text('Error!')
 							modal.find('.modal-body').html(e)
 
@@ -194,38 +194,38 @@ $(window).load(function(){
 							setTimeout(function(){
 								form
 									.removeClass(opt.responseErrorClass)
-									//.trigger('reset')								
+									//.trigger('reset')
 							},opt.successShowDelay)
 						}
-						modal.modal({keyboard:true})						
-					})				
-				}				
+						modal.modal({keyboard:true})
+					})
+				}
 				return false
 			}
-			
+
 			function formReset(){
-				fieldDesolation($('[data-constraints]',form))					
+				fieldDesolation($('[data-constraints]',form))
 			}
 
 			function showRecaptcha(){
 				$('label.recaptcha',form)
 					.append('<div id="captchadiv"></div>')
-				
+
 				Recaptcha.create(
 					opt.recaptchaPublicKey
 					,'captchadiv'
 					, {
-						theme:opt.capchaTheme						
+						theme:opt.capchaTheme
 					}
 				)
 
-				form					
+				form
 					.on('focus','#recaptcha_response_field',function(){
-						$(this).parents('label').removeClass(opt.emptyClass)						
+						$(this).parents('label').removeClass(opt.emptyClass)
 					})
 			}
 		}
-	}	
+	}
 })(jQuery)
 
 ;(function($){
@@ -234,34 +234,34 @@ $(window).load(function(){
 			var th=$(this)
 				,placeholder_text
 				,placeholder
-						
+
 			opt=$.extend({
 					placeholderClass:'_placeholder'
 					,placeholderFocusedClass:'focused'
 					,placeholderHiddenClass:'hidden'
 				},opt)
-				
+
 			init()
-			
-			function init(){				
+
+			function init(){
 				placeholder_text=th.attr('placeholder')
 				placeholder=$(document.createElement('span'))
 				placeholder
 					.addClass(opt.placeholderClass)
-					.css({				
+					.css({
 						left:th.prop('offsetLeft')
 						,top:th.prop('offsetTop')
 						,width:th.width()
-						,height:th.outerHeight()				
+						,height:th.outerHeight()
 					})
 					.text(placeholder_text)
-					.appendTo(th.parent())				
+					.appendTo(th.parent())
 					.click(function(){
 						th.focus()
 						return false
 					})
-					.on('contextmenu',function(){						
-						th.trigger('hide.placeholder').focus()						
+					.on('contextmenu',function(){
+						th.trigger('hide.placeholder').focus()
 					})
 
 				th
@@ -279,26 +279,26 @@ $(window).load(function(){
 					.on('blur',function(){
 						var val=th.val()
 						if(val===''||val===placeholder_text)
-							th.val('')							
+							th.val('')
 							,th.trigger('show.placeholder')
 						placeholder.removeClass(opt.placeholderFocusedClass)
 					})
-					.on('keydown',function(e){												
+					.on('keydown',function(e){
 						if(e.keyCode===32||e.keyCode>46)
-							th.trigger('hide.placeholder')							
+							th.trigger('hide.placeholder')
 					})
-					.on('keyup',function(){						
-						if(th.val()===''){							
+					.on('keyup',function(){
+						if(th.val()===''){
 							th.trigger('show.placeholder')
 							return false
-						}else{							
+						}else{
 							th.trigger('hide.placeholder')
 						}
 					})
 					.parents('form').on('reset',function(){
-						th.trigger('show.placeholder')						
+						th.trigger('show.placeholder')
 					})
-			}			
+			}
 		})
 	}
 })(jQuery)
@@ -333,7 +333,7 @@ eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a
 regula.custom({
 	name:'JustLetters'
 	,validator:function(){
-		return /^[a-zA-Z'][a-zA-Z-' ]+[a-zA-Z']?$/.test(this.value)
+		return /^[a-zA-ZА-Яа-я]+$/.test(this.value)
 	}
 })
 regula.custom({
